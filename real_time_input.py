@@ -3,7 +3,8 @@ import imutils
 import cv2
 from keras.models import load_model
 import numpy as np
-import warning_audio as wa
+from playsound import playsound
+
 
 # parameters for loading data and images
 detection_model_path = 'haarcascade_files/haarcascade_frontalface_default.xml'
@@ -16,6 +17,8 @@ emotion_classifier = load_model(emotion_model_path, compile=False)
 EMOTIONS = ["angry" ,"disgust","scared", "happy", "sad", "surprised",
  "neutral"]
 
+#Alert audios
+Alert=["Audio_text/1.mp3","Audio_text/2.mp3","Audio_text/3.mp3","Audio_text/4.mp3","Audio_text/5.mp3","Audio_text/6.mp3","Audio_text/7.mp3"]
 # starting video streaming
 cv2.namedWindow('your_face')
 camera = cv2.VideoCapture(0)
@@ -44,7 +47,7 @@ while True:
         label = EMOTIONS[preds.argmax()]
         ep_int=int(preds.argmax())
         print(ep_int,EMOTIONS[ep_int])
-        wa.alert("The person in front of you is feeling "+EMOTIONS[ep_int])
+        playsound(Alert[ep_int])
     else: continue
 
  
