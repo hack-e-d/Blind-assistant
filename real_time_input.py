@@ -50,25 +50,10 @@ while True:
         playsound(Alert[ep_int])
     else: continue
 
- 
-    for (i, (emotion, prob)) in enumerate(zip(EMOTIONS, preds)):
-                # construct the label text
-                text = "{}: {:.2f}%".format(emotion, prob * 100)
-
-                # draw the label + probability bar on the canvas
-                          
-                w = int(prob * 300)
-                cv2.rectangle(canvas, (7, (i * 35) + 5),
-                (w, (i * 35) + 35), (0, 0, 255), -1)
-                cv2.putText(canvas, text, (10, (i * 35) + 23),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.45,
-                (255, 255, 255), 2)
-                cv2.putText(frameClone, label, (fX, fY - 10),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
-                cv2.rectangle(frameClone, (fX, fY), (fX + fW, fY + fH),
-                              (0, 0, 255), 2)
+    cv2.putText(frameClone, label, (fX, fY - 10),
+    cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+    cv2.rectangle(frameClone, (fX, fY), (fX + fW, fY + fH),(0, 0, 255), 2)
     cv2.imshow('your_face', frameClone)
-    cv2.imshow("Probabilities", canvas)
     
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
