@@ -4,7 +4,8 @@ import cv2
 from keras.models import load_model
 import numpy as np
 from playsound import playsound
-
+import tkinter as tk
+import sys
 
 # parameters for loading data and images
 detection_model_path = 'haarcascade_files/haarcascade_frontalface_default.xml'
@@ -20,42 +21,56 @@ EMOTIONS = ["angry" ,"disgust","scared", "happy", "sad", "surprised",
 #Alert audios
 Alert=["Audio_text/1.mp3","Audio_text/2.mp3","Audio_text/3.mp3","Audio_text/4.mp3","Audio_text/5.mp3","Audio_text/6.mp3","Audio_text/7.mp3"]
 # starting video streaming
-cv2.namedWindow('your_face')
-camera = cv2.VideoCapture(0)
-while True:
-    frame = camera.read()[1]
-    #reading the frame
-    frame = imutils.resize(frame,width=300)
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = face_detection.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=5,minSize=(30,30),flags=cv2.CASCADE_SCALE_IMAGE)
-    
-    canvas = np.zeros((250, 300, 3), dtype="uint8")
-    frameClone = frame.copy()
-    if len(faces) > 0:
-        faces = sorted(faces, reverse=True,
-        key=lambda x: (x[2] - x[0]) * (x[3] - x[1]))[0]
-        (fX, fY, fW, fH) = faces
-                    # Extract the ROI of the face from the grayscale image, resize it to a fixed 28x28 pixels, and then prepare
-            # the ROI for classification via the CNN
-        roi = gray[fY:fY + fH, fX:fX + fW]
-        roi = cv2.resize(roi, (64, 64))
-        roi = roi.astype("float") / 255.0
-        roi = img_to_array(roi)
-        roi = np.expand_dims(roi, axis=0)
-        preds = emotion_classifier.predict(roi)[0]
-        emotion_probability = np.max(preds)
-        label = EMOTIONS[preds.argmax()]
-        ep_int=int(preds.argmax())
-        print(ep_int,EMOTIONS[ep_int])
-        playsound(Alert[ep_int])
-    else: continue
+def start():
+    cv2.namedWindow('your_face')
+    camera = cv2.VideoCapture(0)
+    while True:
+        frame = camera.read()[1]
+        #reading the frame
+        frame = imutils.resize(frame,width=300)
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = face_detection.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=5,minSize=(30,30),flags=cv2.CASCADE_SCALE_IMAGE)
+        
+        canvas = np.zeros((250, 300, 3), dtype="uint8")
+        frameClone = frame.copy()
+        if len(faces) > 0:
+            faces = sorted(faces, reverse=True,
+            key=lambda x: (x[2] - x[0]) * (x[3] - x[1]))[0]
+            (fX, fY, fW, fH) = faces
+                        # Extract the ROI of the face from the grayscale image, resize it to a fixed 28x28 pixels, and then prepare
+                # the ROI for classification via the CNN
+            roi = gray[fY:fY + fH, fX:fX + fW]
+            roi = cv2.resize(roi, (64, 64))
+            roi = roi.astype("float") / 255.0
+            roi = img_to_array(roi)
+            roi = np.expand_dims(roi, axis=0)
+            preds = emotion_classifier.predict(roi)[0]
+            emotion_probability = np.max(preds)
+            label = EMOTIONS[preds.argmax()]
+            ep_int=int(preds.argmax())
+            print(ep_int,EMOTIONS[ep_int])
+            playsound(Alert[ep_int])
+        else: continue
 
-    cv2.putText(frameClone, label, (fX, fY - 10),
-    cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
-    cv2.rectangle(frameClone, (fX, fY), (fX + fW, fY + fH),(0, 0, 255), 2)
-    cv2.imshow('your_face', frameClone)
-    
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-camera.release()
-cv2.destroyAllWindows()
+        cv2.putText(frameClone, label, (fX, fY - 10),
+        cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+        cv2.rectangle(frameClone, (fX, fY), (fX + fW, fY + fH),(0, 0, 255), 2)
+        cv2.imshow('your_face', frameClone)
+        
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    camera.release()
+    cv2.destroyAllWindows()
+
+
+def close():
+    sys.exit()
+
+top=tk.Tk()
+top.wm_title("Blind Assistant")
+top.geometry("200x150")
+tk.Button(top,text="Analyse Emotion",activebackground="pink",activeforeground="blue",command=start).place(x=15,y=25)
+tk.Button(top, text = "Close",activebackground = "pink", activeforeground = "blue",command=close).place(x = 60, y = 85)
+
+top.mainloop()
+
