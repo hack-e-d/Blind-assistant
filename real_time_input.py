@@ -24,6 +24,8 @@ Alert=["Audio_text/1.mp3","Audio_text/2.mp3","Audio_text/3.mp3","Audio_text/4.mp
 def start():
     cv2.namedWindow('your_face')
     camera = cv2.VideoCapture(0)
+    camera.set(3, 640)
+    camera.set(4, 480)
     while True:
         frame = camera.read()[1]
         #reading the frame
